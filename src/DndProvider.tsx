@@ -83,6 +83,7 @@ export const DndProvider = forwardRef<DndProviderHandle, PropsWithChildren<DndPr
       onFinalize,
       style,
       debug,
+      scrollableContentOffset,
     },
     ref,
   ) {
@@ -211,7 +212,10 @@ export const DndProvider = forwardRef<DndProviderHandle, PropsWithChildren<DndPr
       const panGesture = Gesture.Pan()
         .onBegin((event) => {
           const { state, x, y } = event;
-          debug && console.log("begin", { state, x, y });
+          const tempX = x + scrollableContentOffset.x;
+          const tempY = y + scrollableContentOffset.y;
+          debug && console.log("begin original", { state, x, y });
+          debug && console.log("begin with scrollOffset", { state, x: tempX, y: tempY });
           // Gesture is globally disabled
           if (disabled) {
             return;
@@ -228,7 +232,8 @@ export const DndProvider = forwardRef<DndProviderHandle, PropsWithChildren<DndPr
           //   console.log({ [id]: [offset.x.value, offset.y.value] });
           // }
           // Find the active layout key under {x, y}
-          const activeId = findActiveLayoutId({ x, y });
+          // const activeId = findActiveLayoutId({ x, y });
+            const activeId = findActiveLayoutId({ x: tempX, y: tempY });
           // Check if an item was actually selected
           if (activeId !== null) {
             // Record any ongoing current offset as our initial offset for the gesture
@@ -400,7 +405,7 @@ export const DndProvider = forwardRef<DndProviderHandle, PropsWithChildren<DndPr
 
       return panGesture;
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [disabled]);
+    }, [disabled, scrollableContentOffset]);
 
     return (
       <DndContext.Provider value={contextValue.current}>
