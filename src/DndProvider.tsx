@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { LayoutRectangle, Share, View } from "react-native";
+import { LayoutRectangle, View } from "react-native";
 import {
   Gesture,
   GestureDetector,
@@ -22,14 +22,13 @@ import {
   DndContext,
   DraggableItemOptions,
   DraggableOptions,
-  DraggableState,
   DraggableStates,
   DroppableOptions,
   ItemOptions,
   Layouts,
   Offsets,
 } from "./DndContext";
-import { SharedPoint, UseDraggableOptions, UseDroppableOptions, useSharedPoint } from "./hooks";
+import { useSharedPoint } from "./hooks";
 import { UniqueIdentifier } from "./types";
 import {
   Point,
@@ -83,21 +82,6 @@ export const DndProvider = forwardRef(function DndProvider(
   }: DndProviderProps,
   ref,
 ) {
-  //   const containerRef = useRef(null);
-  //   const draggableLayouts = useSharedValue<{ [key: string]: SharedValue<Rectangle> }>({});
-  //   const droppableLayouts = useSharedValue<{ [key: string]: SharedValue<Rectangle> }>({});
-  //   const draggableOptions = useSharedValue<{ [key: string]: DraggableItemOptions }>({});
-  //   const droppableOptions = useSharedValue<{ [key: string]: ItemOptions }>({});
-  //   const draggableOffsets = useSharedValue<{ [key: string]: SharedPoint }>({});
-  //   const draggableRestingOffsets = useSharedValue<{ [key: string]: SharedPoint }>({});
-  //   const draggableStates = useSharedValue<{ [key: string]: DraggableState }>({});
-  //   const draggablePendingId = useSharedValue<string | null>(null);
-  //   const draggableActiveId = useSharedValue<string | null>(null);
-  //   const droppableActiveId = useSharedValue<string | null>(null);
-  //   const draggableActiveLayout = useSharedValue<Rectangle | null>(null);
-  //   const draggableInitialOffset = useSharedPoint(0, 0);
-  //   const draggableContentOffset = useSharedPoint(0, 0);
-  //   const panGestureState = useSharedValue(0);
   const containerRef = useRef(null);
   const draggableLayouts = useSharedValue<Layouts>({});
   const droppableLayouts = useSharedValue<Layouts>({});
@@ -114,25 +98,6 @@ export const DndProvider = forwardRef(function DndProvider(
   const draggableContentOffset = useSharedPoint(0, 0);
   const panGestureState = useSharedValue<GestureEventPayload["state"]>(0);
 
-  ///
-
-  //   containerRef: RefObject<View>;
-  //   draggableLayouts: SharedValue<Layouts>;
-  //   droppableLayouts: SharedValue<Layouts>;
-  //   draggableOptions: SharedValue<DraggableOptions>;
-  //   droppableOptions: SharedValue<DroppableOptions>;
-  //   draggableOffsets: SharedValue<Offsets>;
-  //   draggableRestingOffsets: SharedValue<Offsets>;
-  //   draggableStates: SharedValue<DraggableStates>;
-  //   draggablePendingId: SharedValue<UniqueIdentifier | null>;
-  //   draggableActiveId: SharedValue<UniqueIdentifier | null>;
-  //   droppableActiveId: SharedValue<UniqueIdentifier | null>;
-  //   draggableActiveLayout: SharedValue<LayoutRectangle | null>;
-  //   draggableInitialOffset: SharedPoint;
-  //   draggableContentOffset: SharedPoint;
-  //   panGestureState: SharedValue<GestureEventPayload["state"]>;
-
-  ////
   // console.log('insight scrollableContentOffset', scrollableContentOffset);
   const runFeedback = () => {
     if (hapticFeedback) {
