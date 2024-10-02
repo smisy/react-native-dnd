@@ -51,4 +51,4 @@ jobs:
           echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Publish Package to GitHub Packages 🚀
-        run: pnpm publish --registry https://npm.pkg.github.com --access public
+        run: pnpm publish --registry https://npm.pkg.github.com --access public --no-git-checks
