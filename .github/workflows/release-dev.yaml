@@ -1,11 +1,9 @@
 name: Release Dev Pipeline
 
+ 
 on:
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'PR number to release from'
-        required: true
+  pull_request:
+    branches: [master]
 
 jobs:
   release_dev:
@@ -14,11 +12,7 @@ jobs:
     steps:
       - name: Checkout PR Code 🛎️
         uses: actions/checkout@v3
-        with:
-          # Check out the code from the PR's head branch
-          ref: refs/pull/${{ github.event.inputs.pr_number }}/head
-          fetch-depth: 0
-          
+
       - name: Setup pnpm 🔧
         uses: pnpm/action-setup@v2
         with:
@@ -45,8 +39,7 @@ jobs:
         id: new_version
         run: |
           BUILD_NUMBER=${{ github.run_number }}
-          PR_NUMBER=${{ github.event.inputs.pr_number }}
-          NEW_VERSION="${{ steps.get_version.outputs.version }}-dev.${PR_NUMBER}.${BUILD_NUMBER}"
+          NEW_VERSION="${{ steps.get_version.outputs.version }}-dev.${BUILD_NUMBER}"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update package.json Version 📝
