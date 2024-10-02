@@ -44,6 +44,7 @@ jobs:
       - name: Update package.json Version 📝
         run: |
           pnpm version "${{ steps.new_version.outputs.new_version }}" --no-git-tag-version
+          sed -i 's/"name": "@mgcrea\/react-native-dnd"/"name": "@smisy\/react-native-dnd"/' package.json
 
       - name: Configure npm to publish to GitHub Packages 🔑
         run: |
