@@ -3,35 +3,31 @@ name: Release Dev Pipeline
 on:
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
-  release_dev:
+  build:
     runs-on: ubuntu-latest
-    name: Release Dev Version
+    name: Release dev
     steps:
-      - name: Checkout PR Code 🛎️
+      - name: Checkout 🛎️
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - name: Setup pnpm 🔧
         uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Setup Node.js 🔧
+      - name: Setup node 🔧
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
+          node-version: 18.19.0s
           check-latest: true
-
+          cache: "pnpm"
       - name: Install 🪄
         run: pnpm install --frozen-lockfile
-
-      - name: Build Package 💎
+      
+      - name: Build 💎
         run: pnpm run build
-
+      
       - name: Get Package Version 📦
         id: get_version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
