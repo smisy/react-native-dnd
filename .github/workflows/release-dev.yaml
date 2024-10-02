@@ -19,7 +19,7 @@ jobs:
       - name: Setup node 🔧
         uses: actions/setup-node@v3
         with:
-          node-version: 18.19.0s
+          node-version: 18.19.0
           check-latest: true
           cache: "pnpm"
       - name: Install 🪄
