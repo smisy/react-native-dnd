@@ -26,10 +26,8 @@ jobs:
           cache: 'pnpm'
           check-latest: true
 
-      - name: Install Dependencies 🪄
-        run: |
-          pnpm config set lockfile-only true
-          pnpm install --no-frozen-lockfile
+      - name: Install 🪄
+        run: pnpm install --frozen-lockfile
 
       - name: Build Package 💎
         run: pnpm run build
