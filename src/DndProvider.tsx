@@ -362,7 +362,9 @@ export const DndProvider = forwardRef(function DndProvider(
                 ) {
                   return;
                 }
-                states[activeId].value = "resting";
+                if (states[activeId]) {
+                  states[activeId].value = "resting";
+                }
                 if (!finishedX || !finishedY) {
                   // console.log(`${activeId} did not finish to reach ${targetX.toFixed(2)} ${currentX}`);
                 }
