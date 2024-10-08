@@ -98,7 +98,6 @@ export const DndProvider = forwardRef(function DndProvider(
   const draggableContentOffset = useSharedPoint(0, 0);
   const panGestureState = useSharedValue<GestureEventPayload["state"]>(0);
 
-  // console.log('insight scrollableContentOffset', scrollableContentOffset);
   const runFeedback = () => {
     if (hapticFeedback) {
       ReactNativeHapticFeedback.trigger(hapticFeedback);
@@ -203,8 +202,8 @@ export const DndProvider = forwardRef(function DndProvider(
       .onBegin((event) => {
         // Reset droppable
         const { state, x, y } = event;
-        const tempX = x + (scrollableContentOffset?.x || 0);
-        const tempY = y + (scrollableContentOffset?.y || 0);
+        const xWithScrollOffset = x + (scrollableContentOffset?.x || 0);
+        const yWithScrollOffset = y + (scrollableContentOffset?.y || 0);
         debug && console.log("begin", { state, x, y });
         // Gesture is globally disabled
         if (disabled) {
@@ -222,15 +221,9 @@ export const DndProvider = forwardRef(function DndProvider(
         //   console.log({ [id]: [offset.x.value, offset.y.value] });
         // }
         // Find the active layout key under {x, y}
-        const activeId = findActiveLayoutId({ x: tempX, y: tempY });
-        // const activeId = findActiveLayoutId({ x, y });
-        console.log("activeId", activeId);
-        // console.log('1draggableActiveId', activeId);
+        const activeId = findActiveLayoutId({ x: xWithScrollOffset, y: yWithScrollOffset });
         // Check if an item was actually selected
         if (activeId !== null) {
-          console.log("1draggableLayouts", draggableLayouts.value[activeId]);
-          console.log("1draggableOffsets", draggableOffsets.value[activeId]);
-          console.log("1draggableRestingOffsets", draggableRestingOffsets.value[activeId]);
           // Record any ongoing current offset as our initial offset for the gesture
           const activeLayout = layouts[activeId].value;
           const activeOffset = offsets[activeId];
@@ -271,7 +264,6 @@ export const DndProvider = forwardRef(function DndProvider(
         }
       })
       .onUpdate((event) => {
-        // console.log(draggableStates.value);
         const { state, translationX, translationY } = event;
         debug && console.log("update", { state, translationX, translationY });
         // Track current state for cancellation purposes
@@ -320,7 +312,7 @@ export const DndProvider = forwardRef(function DndProvider(
         const { value: pendingId } = draggablePendingId;
         const { value: layouts } = draggableLayouts;
         const { value: offsets } = draggableOffsets;
-        const { value: restingOffsets } = draggableRestingOffsets;
+        // const { value: restingOffsets } = draggableRestingOffsets;
         const { value: states } = draggableStates;
         // Ignore item-free interactions
         if (activeId === null) {
@@ -347,18 +339,9 @@ export const DndProvider = forwardRef(function DndProvider(
           const { value: dropActiveId } = droppableActiveId;
 
           if (dropActiveId !== null) {
-            // console.log('over -- layout', droppableLayouts.value[dropActiveId].value.x, droppableLayouts.value[dropActiveId].value.y);
-
             // Move to active droppable position
             const activeOffset = offsets[activeId];
-            // const restingOffset = restingOffsets[activeId];
-            // console.log('active -- offset', activeOffset.x.value, activeOffset.y.value);
-            // console.log('resting -- offset', restingOffset.x.value, restingOffset.y.value);
-            // console.log('draggable active layout --',  draggableLayouts.value[activeId].value);
             states[activeId].value = "acting";
-            // const [targetX, targetY] = [restingOffset.x.value, restingOffset.y.value];
-            // const [targetX, targetY] = [droppableLayouts.value[dropActiveId].value.x - restingOffset.x.value, droppableLayouts.value[dropActiveId].value.y - restingOffset.y.value];
-            // const [targetX, targetY] = [droppableLayouts.value[dropActiveId].value.x, droppableLayouts.value[dropActiveId].value.y];
             const [targetX, targetY] = [
               droppableLayouts.value[dropActiveId].value.x - draggableLayouts.value[activeId].value.x,
               droppableLayouts.value[dropActiveId].value.y - draggableLayouts.value[activeId].value.y,
@@ -388,55 +371,17 @@ export const DndProvider = forwardRef(function DndProvider(
                 // }
               },
             );
-            console.log("2draggableActiveId", activeId);
-            console.log("2draggableLayouts", draggableLayouts.value[activeId]);
-            console.log("2draggableOffsets", draggableOffsets.value[activeId]);
-            console.log("2draggableRestingOffsets", draggableRestingOffsets.value[activeId]);
+
+            // Callback before reseting droppable
+            onDragEnd({
+              active: draggableOptions.value[activeId],
+              over: dropActiveId !== null ? droppableOptions.value[dropActiveId] : null,
+            });
+
             // Reset droppable
             droppableActiveId.value = null;
-
-            // // Update our active offset to pan the active item
-            // const activeOffset = offsets[activeId];
-            // activeOffset.x.value = draggableInitialOffset.x.value + translationX;
-            // activeOffset.y.value = draggableInitialOffset.y.value + translationY;
-            // // Check potential droppable candidates
-            // const activeLayout = layouts[activeId].value;
-            // draggableActiveLayout.value = applyOffset(activeLayout, {
-            //     x: activeOffset.x.value,
-            //     y: activeOffset.y.value,
-            // });
           }
-          onDragEnd({
-            active: draggableOptions.value[activeId],
-            over: dropActiveId !== null ? droppableOptions.value[dropActiveId] : null,
-          });
         }
-        // // Reset droppable
-        // droppableActiveId.value = null;
-        // // Move back to initial position
-        // const activeOffset = offsets[activeId];
-        // const restingOffset = restingOffsets[activeId];
-        // states[activeId].value = "acting";
-        // // const [targetX, targetY] = [restingOffset.x.value, restingOffset.y.value];
-        // const [targetX, targetY] = [droppableLayouts.value[dropActiveId].value.x, droppableLayouts.value[dropActiveId].value.y];
-        // animatePointWithSpring(activeOffset, [targetX, targetY], [
-        //     { ...springConfig, velocity: velocityX },
-        //     { ...springConfig, velocity: velocityY },
-        // ], ([finishedX, finishedY]) => {
-        //     // Cancel if we are interacting again with this item
-        //     if (panGestureState.value !== State.END &&
-        //         panGestureState.value !== State.FAILED &&
-        //         states[activeId].value !== "acting") {
-        //         return;
-        //     }
-        //     states[activeId].value = "resting";
-        //     if (!finishedX || !finishedY) {
-        //         // console.log(`${activeId} did not finish to reach ${targetX.toFixed(2)} ${currentX}`);
-        //     }
-        //     // for (const [id, offset] of Object.entries(offsets)) {
-        //     //   console.log({ [id]: [offset.x.value.toFixed(2), offset.y.value.toFixed(2)] });
-        //     // }
-        // });
       })
       .withTestId("DndProvider.pan");
     // Duration in milliseconds of the LongPress gesture before Pan is allowed to activate.
