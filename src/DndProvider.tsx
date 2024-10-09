@@ -11,7 +11,6 @@ import {
 } from "react-native-gesture-handler";
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {
-  SharedValue,
   cancelAnimation,
   runOnJS,
   runOnUI,
@@ -39,7 +38,7 @@ import {
   includesPoint,
   overlapsRectangle,
 } from "./utils";
-interface DndProviderProps {
+export interface DndProviderProps {
   children: React.ReactNode;
   springConfig?: object;
   minDistance?: number;
