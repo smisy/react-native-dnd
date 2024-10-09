@@ -25,7 +25,8 @@
     "prettycheck": "prettier --check src/ test/",
     "typecheck": "tsc --noEmit",
     "test": "npm run typecheck && npm run spec && npm run lint && npm run prettycheck",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "windows": "react-native run-windows"
   },
   "peerDependencies": {
     "react": ">=17",
@@ -61,6 +62,10 @@
     "react-test-renderer": "^18.2.0",
     "tsc-alias": "^1.8.8",
     "tsup": "^8.0.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "metro-config": "^0.80.12"
+  },
+  "dependencies": {
+    "react-native-windows": "^0.75.4"
   }
 }
