@@ -1,0 +1,55 @@
+name: Release Dev Pipeline
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Release dev
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+      - name: Setup pnpm 🔧
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup node 🔧
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.19.0
+          check-latest: true
+          cache: "pnpm"
+      - name: Install 🪄
+        run: |
+          ls -la
+          pnpm install --frozen-lockfile
+      
+      - name: Build 💎
+        run: pnpm run build
+      
+      - name: Get Package Version 📦
+        id: get_version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Construct New Version 🛠️
+        id: new_version
+        run: |
+          BUILD_NUMBER=${{ github.run_number }}
+          NEW_VERSION="${{ steps.get_version.outputs.version }}-dev.${BUILD_NUMBER}"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update package.json Version 📝
+        run: |
+          pnpm version "${{ steps.new_version.outputs.new_version }}" --no-git-tag-version
+          sed -i 's/"name": "@mgcrea\/react-native-dnd"/"name": "@smisy\/react-native-dnd"/' package.json
+
+      - name: Configure npm to publish to GitHub Packages 🔑
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+
+      - name: Publish Package to GitHub Packages 🚀
+        run: pnpm publish --registry https://npm.pkg.github.com --access public --no-git-checks
